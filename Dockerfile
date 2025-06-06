@@ -22,7 +22,7 @@ COPY client ./client
 RUN npm run build
 
 # Runtime Container
-FROM python:3.11-slim-bullseye
+FROM python:3.11-slim-bullseye AS runtime
 
 ARG BUILD_DIR
 
@@ -43,8 +43,8 @@ RUN apt update && apt install -y \
     gosu \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir pipenv
-
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple && \
+    pip install --no-cache-dir pipenv
 WORKDIR ${APP_PATH}
 
 COPY LICENSE Pipfile Pipfile.lock ./
