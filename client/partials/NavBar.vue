@@ -6,13 +6,13 @@
     <div class="flex grow items-start justify-end">
       <!-- New Note -->
       <RouterLink v-if="showNewButton" :to="{ name: 'new' }">
-        <CustomButton :iconPath="mdilPlusCircle" label="New Note" />
+        <CustomButton :iconPath="mdilPlusCircle" label="新建笔记" />
       </RouterLink>
       <!-- Menu -->
       <CustomButton
         class="ml-1"
         :iconPath="mdilMenu"
-        label="Menu"
+        label="菜单"
         @click="toggleMenu"
       />
       <PrimeMenu ref="menu" :model="menuItems" :popup="true" />
@@ -52,13 +52,13 @@ const emit = defineEmits(["toggleSearchModal"]);
 
 const menuItems = [
   {
-    label: "Search",
+    label: "搜索",
     icon: mdilMagnify,
     command: () => emit("toggleSearchModal"),
     keyboardShortcut: "/",
   },
   {
-    label: "All Notes",
+    label: "所有笔记",
     icon: mdilNoteMultiple,
     command: () =>
       router.push({
@@ -70,7 +70,7 @@ const menuItems = [
       }),
   },
   {
-    label: "Toggle Theme",
+    label: "主题",
     icon: mdilMonitor,
     command: toggleTheme,
   },
@@ -79,7 +79,7 @@ const menuItems = [
     visible: showLogOutButton,
   },
   {
-    label: "Log Out",
+    label: "注销",
     icon: mdilLogout,
     command: logOut,
     visible: showLogOutButton,

@@ -42,10 +42,10 @@ const props = defineProps({
   title: { type: String, default: "Confirmation" },
   message: String,
   confirmButtonStyle: { type: String, default: "cta" },
-  confirmButtonText: { type: String, default: "Confirm" },
+  confirmButtonText: { type: String, default: "确定" },
   cancelButtonStyle: { type: String, default: "subtle" },
-  cancelButtonText: { type: String, default: "Cancel" },
-  rejectButtonStyle: { type: String, default: "danger" },
+  cancelButtonText: { type: String, default: "取消" },
+  rejectButtonStyle: { type: String, default: "危险" },
   rejectButtonText: { type: String },
 });
 const emit = defineEmits(["confirm", "reject", "cancel"]);

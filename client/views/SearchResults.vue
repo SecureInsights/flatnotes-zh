@@ -7,7 +7,7 @@
       <!-- Sort By -->
       <div class="flex justify-end">
         <CustomButton
-          :label="`Sort By: ${sortByName}`"
+          :label="`排序: ${sortByName}`"
           :iconPath="mdiSort"
           class="mb-1"
           @click="toggleSortMenu"

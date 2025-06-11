@@ -2,9 +2,9 @@
   <!-- Confirm Deletion Modal -->
   <ConfirmModal
     v-model="isDeleteModalVisible"
-    title="Confirm Deletion"
-    :message="`Are you sure you want to delete the note '${note.title}'?`"
-    confirmButtonText="Delete"
+    title="确认删除"
+    :message="`您确定删除该笔记 '${note.title}'?`"
+    confirmButtonText="删除"
     confirmButtonStyle="danger"
     @confirm="deleteConfirmedHandler"
   />
@@ -12,8 +12,8 @@
   <!-- Save Changes Modal -->
   <ConfirmModal
     v-model="isSaveChangesModalVisible"
-    title="Save Changes"
-    message="Do you want to save your changes?"
+    title="保存修改"
+    message="您要保存您的修改吗？"
     confirmButtonText="Save"
     confirmButtonStyle="success"
     rejectButtonText="Discard"
@@ -25,11 +25,11 @@
   <!-- Draft Modal -->
   <ConfirmModal
     v-model="isDraftModalVisible"
-    title="Draft Detected"
-    message="There is an unsaved draft of this note stored in this browser. Do you want to resume the draft version or delete it?"
-    confirmButtonText="Resume Draft"
+    title="检测到草稿"
+    message="浏览器中检测到此笔记的未保存草稿。您想恢复草稿版本还是删除它？"
+    confirmButtonText="恢复草稿"
     confirmButtonStyle="cta"
-    rejectButtonText="Delete Draft"
+    rejectButtonText="删除草稿"
     rejectButtonStyle="danger"
     @confirm="setEditMode()"
     @reject="
@@ -57,14 +57,14 @@
         <!-- Delete Button -->
         <CustomButton
           v-show="canModify && !isNewNote"
-          label="Delete"
+          label="删除"
           :iconPath="mdilDelete"
           @click="deleteHandler"
         />
         <!-- Save Button -->
         <CustomButton
           v-show="editMode"
-          label="Save"
+          label="保存"
           :iconPath="mdilContentSave"
           @click="saveHandler((close = false))"
           class="relative ml-1"
@@ -78,7 +78,7 @@
         <!-- Edit Toggle -->
         <Toggle
           v-if="canModify"
-          label="Edit"
+          label="编辑"
           :isOn="editMode"
           class="ml-1"
           @click="toggleEditModeHandler"
