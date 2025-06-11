@@ -73,9 +73,9 @@ const toast = useToast();
 
 const sortByName = computed(() => {
   const sortOptionNames = {
-    [searchSortOptions.title]: "Title",
-    [searchSortOptions.lastModified]: "Last Modified",
-    [searchSortOptions.score]: "Score",
+    [searchSortOptions.title]: "标题",
+    [searchSortOptions.lastModified]: "修改时间",
+    [searchSortOptions.score]: "得分",
   };
   return sortOptionNames[props.sortBy];
 });
@@ -123,20 +123,20 @@ function updateSortByParam(sortBy) {
 
 const menuItems = [
   {
-    label: "Sort By: Score",
+    label: "根据: 得分排序",
     command: () => {
       updateSortByParam(searchSortOptions.score);
     },
   },
 
   {
-    label: "Sort By: Title",
+    label: "根据: 标题排序",
     command: () => {
       updateSortByParam(searchSortOptions.title);
     },
   },
   {
-    label: "Sort By: Last Modified",
+    label: "根据: 修改时间排序",
     command: () => {
       updateSortByParam(searchSortOptions.lastModified);
     },
