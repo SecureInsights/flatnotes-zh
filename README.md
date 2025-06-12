@@ -2,7 +2,7 @@
 
 ![GitHub](https://img.shields.io/github/license/dullage/flatnotes?style=flat-square)
 
-![Docker Pulls](https://img.shields.io/docker/pulls/dullage/flatnotes?style=flat-square)
+[//]: # (![Docker Pulls]&#40;https://img.shields.io/docker/pulls/dullage/flatnotes?style=flat-square&#41;)
 
 ## 项目简介
 
@@ -21,7 +21,9 @@ Flatnotes 是一个基于浏览器的轻量级笔记应用，使用 Vue.js 和 P
 
 ## 快速开始
 
-### 使用Docker运行
+### 使用Docker运行 
+
+国内：
 
 ```bash
 docker run -d \
@@ -31,17 +33,20 @@ docker run -d \
   -e FLATNOTES_USERNAME=user \
   -e FLATNOTES_PASSWORD=changeMe! \
   -e FLATNOTES_SECRET_KEY=aLongRandomSeriesOfCharacters \
-  dullage/flatnotes:latest
+  crpi-pormt4sdd35mkqt3.cn-hangzhou.personal.cr.aliyuncs.com/jettzhan/flatnotes-zh
 ```
 
 ### 使用docker-compose
+
+国内：
 
 ```yaml
 version: "3"
 
 services:
   flatnotes:
-    image: dullage/flatnotes:latest
+    image: crpi-pormt4sdd35mkqt3.cn-hangzhou.personal.cr.aliyuncs.com/jettzhan/flatnotes-zh:latest
+    container_name: flatnotes
     ports:
       - "8080:8080"
     volumes:
