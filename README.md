@@ -1,8 +1,6 @@
 # Flatnotes - 轻量级笔记应用
 
-![GitHub](https://img.shields.io/github/license/dullage/flatnotes?style=flat-square)
-
-[//]: # (![Docker Pulls]&#40;https://img.shields.io/docker/pulls/dullage/flatnotes?style=flat-square&#41;)
+![GitHub](https://img.shields.io/github/license/dullage/flatnotes?style=flat-square) ![Docker Pulls](https://img.shields.io/docker/pulls/jettzhan/flatnotes-zh?style=flat-square)
 
 ## 项目简介
 
@@ -23,7 +21,7 @@ Flatnotes 是一个基于浏览器的轻量级笔记应用，使用 Vue.js 和 P
 
 ### 使用Docker运行 
 
-国内：
+国内加速：
 
 ```bash
 docker run -d \
@@ -36,9 +34,22 @@ docker run -d \
   crpi-pormt4sdd35mkqt3.cn-hangzhou.personal.cr.aliyuncs.com/jettzhan/flatnotes-zh
 ```
 
+海外：
+
+```bash
+docker run -d \
+  -p 8080:8080 \
+  -v $(pwd)/data:/data \
+  -e FLATNOTES_AUTH_TYPE=password \
+  -e FLATNOTES_USERNAME=user \
+  -e FLATNOTES_PASSWORD=changeMe! \
+  -e FLATNOTES_SECRET_KEY=aLongRandomSeriesOfCharacters \
+   jettzhan/flatnotes-zh
+```
+
 ### 使用docker-compose
 
-国内：
+国内加速：
 
 ```yaml
 version: "3"
@@ -58,6 +69,28 @@ services:
       FLATNOTES_SECRET_KEY: "aLongRandomSeriesOfCharacters"
     restart: unless-stopped
 ```
+
+海外：
+
+```yaml
+version: "3"
+
+services:
+  flatnotes:
+    image: jettzhan/flatnotes-zh
+    container_name: flatnotes
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./data:/data"
+    environment:
+      FLATNOTES_AUTH_TYPE: "password"
+      FLATNOTES_USERNAME: "user"
+      FLATNOTES_PASSWORD: "changeMe!"
+      FLATNOTES_SECRET_KEY: "aLongRandomSeriesOfCharacters"
+    restart: unless-stopped
+```
+
 
 ## 开发
 
