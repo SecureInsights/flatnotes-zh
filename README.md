@@ -1,6 +1,6 @@
 # Flatnotes - 轻量级笔记应用
 
-![GitHub](https://img.shields.io/github/license/dullage/flatnotes?style=flat-square) ![Docker Pulls](https://img.shields.io/docker/pulls/jettzhan/flatnotes-zh?style=flat-square)
+![GitHub](https://img.shields.io/github/license/jettzhan/flatnotes-zh?style=flat-square) ![Docker Pulls](https://img.shields.io/docker/pulls/jettzhan/flatnotes-zh?style=flat-square)
 
 ## 项目简介
 
