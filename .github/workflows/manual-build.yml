@@ -1,0 +1,215 @@
+name: 手动打包项目
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_frontend:
+        description: '构建前端（Vue + Vite）'
+        required: true
+        default: true
+        type: boolean
+      build_backend:
+        description: '构建后端（Python + FastAPI）'
+        required: true
+        default: true
+      artifact_name:
+        description: '构建产物名称（用于下载）'
+        required: false
+        default: 'flatnotes-build'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 显示构建配置
+        run: |
+          echo "==================== 构建配置 ===================="
+          echo "📦 构建前端: ${{ inputs.build_frontend }}"
+          echo "🐍 构建后端: ${{ inputs.build_backend }}"
+          echo "📁 产物名称: ${{ inputs.artifact_name }}"
+          echo "=================================================="
+
+      # ==================== 前端构建 ====================
+      - name: 设置 Node.js
+        if: inputs.build_frontend == true
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: 安装前端依赖
+        if: inputs.build_frontend == true
+        run: |
+          echo "📥 正在安装前端依赖..."
+          npm ci
+
+      - name: 构建前端
+        if: inputs.build_frontend == true
+        run: |
+          echo "🔨 正在构建前端..."
+          npm run build
+          echo "✅ 前端构建完成"
+          ls -lh client/dist/
+
+      # ==================== 后端构建 ====================
+      - name: 设置 Python
+        if: inputs.build_backend == true
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装 pipenv
+        if: inputs.build_backend == true
+        run: pip install pipenv
+
+      - name: 安装后端依赖
+        if: inputs.build_backend == true
+        run: |
+          echo "📥 正在安装后端依赖..."
+          pipenv install --system
+          echo "✅ 后端依赖安装完成"
+
+      - name: 检查后端代码
+        if: inputs.build_backend == true
+        run: |
+          echo "🔍 正在检查后端代码..."
+          pipenv run flake8 server/ || echo "⚠️ flake8 检查完成（有警告）"
+          pipenv run black --check server/ || echo "⚠️ black 检查完成（有警告）"
+          pipenv run isort --check-only server/ || echo "⚠️ isort 检查完成（有警告）"
+
+      # ==================== 打包构建产物 ====================
+      - name: 创建打包目录
+        run: |
+          mkdir -p dist/${{ inputs.artifact_name }}
+
+      - name: 复制前端文件
+        if: inputs.build_frontend == true
+        run: |
+          echo "📦 正在打包前端文件..."
+          cp -r client/dist dist/${{ inputs.artifact_name }}/frontend
+          echo "✅ 前端文件打包完成"
+
+      - name: 复制后端文件
+        if: inputs.build_backend == true
+        run: |
+          echo "📦 正在打包后端文件..."
+          cp -r server dist/${{ inputs.artifact_name }}/
+          cp Pipfile Pipfile.lock LICENSE README.md dist/${{ inputs.artifact_name }}/
+          echo "✅ 后端文件打包完成"
+
+      - name: 创建部署说明文件
+        run: |
+          cat > dist/${{ inputs.artifact_name }}/DEPLOY.md << 'EOF'
+          # 部署说明
+
+          ## 目录结构
+          - frontend/: 前端构建产物（Vue静态文件）
+          - server/: 后端代码（Python FastAPI）
+          - Pipfile: Python依赖管理文件
+          - README.md: 项目说明
+
+          ## 前端部署
+          前端已构建完成，可直接部署到任何静态服务器：
+          - Nginx/Apache: 将 frontend/ 目录配置为静态文件根目录
+          - CDN: 上传 frontend/ 目录到CDN
+          - Node.js: 使用 serve 或 http-server 托管
+
+          ## 后端部署
+          1. 安装 Python 3.11
+          2. 安装依赖:
+             \`\`\`bash
+             pip install pipenv
+             cd server
+             pipenv install --system
+             \`\`\`
+          3. 运行服务:
+             \`\`\`bash
+             uvicorn server.main:app --host 0.0.0.0 --port 8080
+             \`\`\`
+
+          ## 环境变量
+          设置以下环境变量：
+          - FLATNOTES_PATH: 笔记存储路径（默认：/data）
+          - FLATNOTES_HOST: 监听地址（默认：0.0.0.0）
+          - FLATNOTES_PORT: 监听端口（默认：8080）
+          - FLATNOTES_AUTH_TYPE: 认证类型（password/none）
+          - FLATNOTES_USERNAME: 用户名
+          - FLATNOTES_PASSWORD: 密码
+          - FLATNOTES_SECRET_KEY: 加密密钥
+
+          构建时间: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          构建分支: ${{ github.ref_name }}
+          提交哈希: ${{ github.sha }}
+          EOF
+
+      - name: 创建压缩包
+        run: |
+          cd dist
+          tar -czf ${{ inputs.artifact_name }}.tar.gz ${{ inputs.artifact_name }}/
+          zip -r ${{ inputs.artifact_name }}.zip ${{ inputs.artifact_name }}/
+          echo "📦 压缩包创建完成"
+          ls -lh ${{ inputs.artifact_name }}.*
+
+      # ==================== 上传构建产物 ====================
+      - name: 上传构建产物（压缩包）
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}-archives
+          path: |
+            dist/${{ inputs.artifact_name }}.tar.gz
+            dist/${{ inputs.artifact_name }}.zip
+          retention-days: 30
+
+      - name: 上传前端构建产物
+        if: inputs.build_frontend == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}-frontend
+          path: client/dist/
+          retention-days: 30
+
+      - name: 上传后端代码
+        if: inputs.build_backend == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}-backend
+          path: |
+            server/
+            Pipfile
+            Pipfile.lock
+          retention-days: 30
+
+      # ==================== 构建摘要 ====================
+      - name: 生成构建摘要
+        run: |
+          echo "## 🎉 构建完成！" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 构建信息" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 前端: ${{ inputs.build_frontend }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 🐍 后端: ${{ inputs.build_backend }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 🏷️ 产物名称: ${{ inputs.artifact_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 🌿 分支: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔖 提交: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 下载构建产物" >> $GITHUB_STEP_SUMMARY
+          echo "点击下方的 **Artifacts** 部分下载构建产物：" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 **${{ inputs.artifact_name }}-archives**: 完整压缩包（.tar.gz 和 .zip）" >> $GITHUB_STEP_SUMMARY
+          echo "- 🌐 **${{ inputs.artifact_name }}-frontend**: 前端构建产物" >> $GITHUB_STEP_SUMMARY
+          echo "- 🐍 **${{ inputs.artifact_name }}-backend**: 后端源码" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📂 文件大小" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ inputs.build_frontend }}" == "true" ]; then
+            FRONTEND_SIZE=$(du -sh client/dist | cut -f1)
+            echo "- 🌐 前端: ${FRONTEND_SIZE}" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ inputs.build_backend }}" == "true" ]; then
+            BACKEND_SIZE=$(du -sh server | cut -f1)
+            echo "- 🐍 后端: ${BACKEND_SIZE}" >> $GITHUB_STEP_SUMMARY
+          fi
